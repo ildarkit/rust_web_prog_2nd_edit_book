@@ -1,5 +1,5 @@
 use tokio::sync::{mpsc, oneshot, mpsc::Sender};
-use crate::order_tracker::TrackerMessage;
+use crate::order_tracker::{TrackerMessage, Order};
 
 
 #[derive(Debug)]
@@ -43,9 +43,7 @@ impl OrderBookActor {
 
             let (send, _) = oneshot::channel();
             let tracker_message = TrackerMessage{
-                command: "BUY".to_string(),
-                ticker: Some(message.ticker),
-                amount: Some(message.amount),
+                command: Order::BUY(message.ticker, message.amount),
                 respond_to: send
             };
             let _ = self.sender.send(tracker_message).await;
@@ -55,7 +53,7 @@ impl OrderBookActor {
     pub async fn run(mut self) {
         println!("actor is running");
         while let Some(msg) = self.receiver.recv().await {
-            self.handle_message(msg);
+            self.handle_message(msg).await;
         }
     }
 }

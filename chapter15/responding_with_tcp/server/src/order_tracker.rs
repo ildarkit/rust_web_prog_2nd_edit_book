@@ -55,7 +55,7 @@ impl TrackerActor {
         }
         buffer.push("\n".to_string());
         println!("sending state: {}", buffer.join(""));
-        respond_to.send(buffer.join(""));
+        let _ = respond_to.send(buffer.join(""));
     }
     fn handle_message(&mut self, message: TrackerMessage) {
         match message.command {
